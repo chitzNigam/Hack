@@ -9,21 +9,19 @@ contract EtherChat {
 		uint msg_type; //1-text,2-file
 		string data;
 	}
+
+	address public s;
 	
-	string[] public s;
-	string public ss;
-	bool public t;
-	uint public count1;
 	event msgAdd(address sender, string reciver, string data, uint msg_type); 
 	event msgSearch(string senderList, string sender);
 
 	constructor () public {
-		addUser(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b, "01");
-		addUser(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"00");
-		subscribe(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"01");
-		publishMsg(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b,"00","Hello",1);
-		t = _strcomp("0","0");
-		//string[] memory mm = getMsg(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A, "01");
+		// addUser(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b, "01");
+		// addUser(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"00");
+		// subscribe(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"01");
+		// publishMsg(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b,"00","Hello",1);
+		s = msg.sender;
+
 	} 
 
 	mapping (string  => mapping (string  => Msg)) users;
@@ -34,18 +32,19 @@ contract EtherChat {
 	
 	
 	
-	function publishMsg (address sender, string memory reciver, string memory data, uint msg_type) public {
-		users[usernames[sender]][reciver] = Msg(usernames[sender],msg_type,data);
-		emit msgAdd(sender, reciver, data, msg_type);
+	function publishMsg (string memory reciver, string memory data, uint msg_type) public {
+		users[usernames[msg.sender]][reciver] = Msg(usernames[msg.sender],msg_type,data);
+		emit msgAdd(msg.sender, reciver, data, msg_type);
 		
 	}
 	
-	function getMsg (address subscriber, string memory sender) public {
+	function getMsg (string memory sender) public returns(Msg[100] memory){
 		string[100] memory msgs;
 		Msg memory temp;
+		Msg[100] memory toReturn;
 		uint i;
 		uint count = 0;
-		string memory myUsername = usernames[subscriber];
+		string memory myUsername = usernames[msg.sender];
 		string[] memory mySubscribers = subscriberList[myUsername];
 
 		for(i=0; i < mySubscribers.length; ++i){
@@ -54,32 +53,29 @@ contract EtherChat {
 				emit msgSearch(temp.sender,sender);
 				if(_strcomp(temp.sender,sender)){
 					msgs[count] = temp.data;
+					toReturn[count] = temp;
 					count++;
 				}
 			
 		}
-		//count1=count;
-		// ss = myUsername;
-		// s = subscriberList[myUsername];
-		// count1 = s.length;
-		//return msgs;
-		s = msgs;
+		return toReturn;
 	}
 
-	function addUser (address add, string memory username) public {
-		if(ListOfAllAccounts[add]==true)
+	function addUser (string memory username) public {
+		if(ListOfAllAccounts[msg.sender]==true)
 			return;
 		if(ListOfAllUsernames[username]==true)
 			return;
-		usernames[add]  = username;
+		usernames[msg.sender]  = username;
 		ListOfAllUsernames[username] = true;
-		ListOfAllAccounts[add] = true;
+		ListOfAllAccounts[msg.sender] = true;
+		s = msg.sender;
 		
 	}
 	
-	function subscribe (address me, string memory username) public {
-		if(!_isPresentInList(subscriberList[usernames[me]], username)){
-			subscriberList[usernames[me]].push(username);
+	function subscribe (string memory username) public {
+		if(!_isPresentInList(subscriberList[usernames[msg.sender]], username)){
+			subscriberList[usernames[msg.sender]].push(username);
 		}
 	}
 	
