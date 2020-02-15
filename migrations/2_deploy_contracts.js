@@ -1,5 +1,5 @@
-var EtherChat = artifacts.require("./EtherChat.sol");
+const MyStringStore = artifacts.require("MyStringStore");
 
 module.exports = function(deployer) {
-  deployer.deploy(EtherChat);
+  deployer.deploy(MyStringStore);
 };
