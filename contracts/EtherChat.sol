@@ -14,7 +14,11 @@ contract EtherChat {
 
 	mapping (string  => mapping (string  => Msg)) users;
 	mapping (string  => string[] ) subscriberList;
-	mapping (address => string ) usernames;
+	mapping (address => string ) public usernames ;
+	mapping (address => bool) public ListOfAllUsernames;
+	mapping (address => bool) ListOfAllAccounts;
+	
+	
 	
 	function publishMsg (address sender, string memory reciver, bytes32[] memory data, uint msg_type) public {
 		users[usernames[sender]][reciver] = Msg(msg_type,data);
@@ -35,8 +39,13 @@ contract EtherChat {
 	function addUser (address add, string memory username) public {
 		//TODO : chack for duplicate usernames
 		//TODO : No two userADD shoud have different accounts
-		if(keccak256(abi.encodePacked((usernames[add]))) == keccak256(abi.encodePacked((username))))
-			usernames[add]  = username;
+
+		usernames[add]  = username;
+		
+	}
+
+	function _userNameExist (string memory username) private returns(bool res) {
+		
 	}
 	
 	function subscribe (address me, string memory username) public {
