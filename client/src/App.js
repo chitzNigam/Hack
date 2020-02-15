@@ -58,6 +58,8 @@ class App extends Component {
     this.state.contract.addUser(event.target.text[0]);
     console.log(event.target.text[0]);
     };
+
+    a.res
   }
 
 

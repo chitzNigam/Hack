@@ -16,11 +16,13 @@ contract EtherChat {
 	event msgSearch(string senderList, string sender);
 
 	constructor () public {
-		// addUser(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b, "01");
-		// addUser(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"00");
-		// subscribe(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"01");
-		// publishMsg(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b,"00","Hello",1);
+		usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b] = "01";
+		usernames[0xC134252dEdef77ea78A0CeD1d918c443e1C0739A] = "00";
+		subcriberList[usernames[0xC134252dEdef77ea78A0CeD1d918c443e1C0739A]].push("01");
+		Msg t = new Msg(usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b],1,"Hello");
+		users[usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b]]["00"] = t;
 		s = msg.sender;
+
 
 	} 
 
