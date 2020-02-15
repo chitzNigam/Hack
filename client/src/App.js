@@ -5,7 +5,7 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  state = { storageValue: 0, web3: null, accounts: null, contract: null, myUsername: '' };
 
   componentDidMount = async () => {
     try {
@@ -35,11 +35,15 @@ class App extends Component {
     }
   };
 
-  runExample = async () => {
-    // const { accounts, contract } = this.state;
+  _setUsername(){
+    this.state.myUsername = this.contract.getUsername(this.accounts[0]);
+  }
 
+  runExample = async () => {
+
+     const { accounts, contract } = this.state;
+     
     // // Stores a given value, 5 by default.
-    // await contract.methods.set(5).send({ from: accounts[1] });
 
     // // Get the value from the contract to prove it worked.
     // const response = await contract.methods.get().call();
@@ -48,23 +52,26 @@ class App extends Component {
     // this.setState({ storageValue: response });
   };
 
+  addUser(event){
+    event.preventDefault()
+    var a = async (event) => {
+    this.state.contract.addUser(event.target.text[0]);
+    console.log(event.target.text[0]);
+    };
+  }
+
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
       <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 40</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
+        Add username : {this.state.myUsername}<br/>
+         <form onSubmit={this.addUser} >
+                <input type='text'  placeholder="Enter Username"/>
+                <input type='submit' text='Submit' value='Submit'/>
+              </form>
       </div>
     );
   }

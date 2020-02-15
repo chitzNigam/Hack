@@ -73,6 +73,10 @@ contract EtherChat {
 		
 	}
 	
+	function getUsername () public returns(string memory){
+		return usernames[msg.sender];
+	}
+	
 	function subscribe (string memory username) public {
 		if(!_isPresentInList(subscriberList[usernames[msg.sender]], username)){
 			subscriberList[usernames[msg.sender]].push(username);
