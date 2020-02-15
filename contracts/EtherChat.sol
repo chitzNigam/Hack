@@ -3,48 +3,62 @@ pragma experimental ABIEncoderV2;
 
 contract EtherChat {
 
+
 	struct Msg {
+		string sender;
 		uint msg_type; //1-text,2-file
-		bytes32[] data;
+		string data;
 	}
 	
+	string[] public s;
+
 	constructor () public {
 		addUser(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b, "01");
+		addUser(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"00");
+		subscribe(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"01");
+		publishMsg(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b,"00","Hello",1);
+		//string[] memory mm = getMsg(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A, "01");
 	} 
 
 	mapping (string  => mapping (string  => Msg)) users;
 	mapping (string  => string[] ) subscriberList;
 	mapping (address => string ) public usernames ;
-	mapping (address => bool) public ListOfAllUsernames;
+	mapping (string => bool) ListOfAllUsernames;
 	mapping (address => bool) ListOfAllAccounts;
 	
 	
 	
-	function publishMsg (address sender, string memory reciver, bytes32[] memory data, uint msg_type) public {
-		users[usernames[sender]][reciver] = Msg(msg_type,data);
+	function publishMsg (address sender, string memory reciver, string memory data, uint msg_type) public {
+		users[usernames[sender]][reciver] = Msg(usernames[sender],msg_type,data);
 	}
 	
-	function getMsg (address subscriber) public returns(Msg[] memory){
-		Msg[] memory msgs;
+	function getMsg (address subscriber, string memory sender) public {
+		string[] memory msgs;
+		Msg memory temp;
 		uint i;
+		uint count = 0;
 		string memory myUsername = usernames[subscriber];
 		string[] memory mySubscribers = subscriberList[myUsername];
 
 		for(i=0; i<mySubscribers.length; ++i){
-			msgs[i] = users[mySubscribers[i]][myUsername];
+			temp = users[mySubscribers[i]][myUsername];
+			if(_strcomp(temp.sender,sender)){
+				msgs[count] = temp.data;
+				count++;
+			}
 		}
-		return msgs;
+		s = msgs;
+		//return msgs;
 	}
 
 	function addUser (address add, string memory username) public {
-		//TODO : chack for duplicate usernames
-		//TODO : No two userADD shoud have different accounts
-
+		if(ListOfAllAccounts[add]==true)
+			return;
+		if(ListOfAllUsernames[username]==true)
+			return;
 		usernames[add]  = username;
-		
-	}
-
-	function _userNameExist (string memory username) private returns(bool res) {
+		ListOfAllUsernames[username] = true;
+		ListOfAllAccounts[add] = true;
 		
 	}
 	
@@ -57,12 +71,20 @@ contract EtherChat {
 	function _isPresentInList (string[] memory list, string memory s) private returns (bool) {
 		uint i=0;
 		for(i=0; i<list.length; ++i){
-			if(keccak256(abi.encodePacked((s))) == keccak256(abi.encodePacked((list[i])))){
+			if(_strcomp(s,list[i])){
 				return true;
 			}
 		}
 		return false;
 	}
+
+	function _strcomp (string memory s1, string memory s2) private returns(bool res) {
+		if(keccak256(abi.encodePacked((s1))) == keccak256(abi.encodePacked((s2))))
+			return true;
+		else
+			return false;
+	}
+	
 
 	//TODO : check subscribe and publish
 	//TODO : End-to-End encryption
