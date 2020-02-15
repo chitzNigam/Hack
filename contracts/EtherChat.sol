@@ -11,12 +11,18 @@ contract EtherChat {
 	}
 	
 	string[] public s;
+	string public ss;
+	bool public t;
+	uint public count1;
+	event msgAdd(address sender, string reciver, string data, uint msg_type); 
+	event msgSearch(string senderList, string sender);
 
 	constructor () public {
 		addUser(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b, "01");
 		addUser(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"00");
 		subscribe(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A,"01");
 		publishMsg(0xfCAE8fE9C7757014a5b028686250cD1C28c2269b,"00","Hello",1);
+		t = _strcomp("0","0");
 		//string[] memory mm = getMsg(0xC134252dEdef77ea78A0CeD1d918c443e1C0739A, "01");
 	} 
 
@@ -30,25 +36,34 @@ contract EtherChat {
 	
 	function publishMsg (address sender, string memory reciver, string memory data, uint msg_type) public {
 		users[usernames[sender]][reciver] = Msg(usernames[sender],msg_type,data);
+		emit msgAdd(sender, reciver, data, msg_type);
+		
 	}
 	
 	function getMsg (address subscriber, string memory sender) public {
-		string[] memory msgs;
+		string[100] memory msgs;
 		Msg memory temp;
 		uint i;
 		uint count = 0;
 		string memory myUsername = usernames[subscriber];
 		string[] memory mySubscribers = subscriberList[myUsername];
 
-		for(i=0; i<mySubscribers.length; ++i){
+		for(i=0; i < mySubscribers.length; ++i){
 			temp = users[mySubscribers[i]][myUsername];
-			if(_strcomp(temp.sender,sender)){
-				msgs[count] = temp.data;
-				count++;
-			}
+		
+				emit msgSearch(temp.sender,sender);
+				if(_strcomp(temp.sender,sender)){
+					msgs[count] = temp.data;
+					count++;
+				}
+			
 		}
-		s = msgs;
+		//count1=count;
+		// ss = myUsername;
+		// s = subscriberList[myUsername];
+		// count1 = s.length;
 		//return msgs;
+		s = msgs;
 	}
 
 	function addUser (address add, string memory username) public {
