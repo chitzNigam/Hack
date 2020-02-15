@@ -2,14 +2,32 @@ import React, { Component } from 'react'
 import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
 import getWeb3 from './utils/getWeb3'
 import ipfs from './ipfs'
-
-//import Encryp from 'https://rawcdn.githack.com/mdp/gibberish-aes/a1a10dc8037487e6fb0ecfeae89e14d8c382c2f9/src/gibberish-aes.js'
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
+const crypto = require('crypto');
+const algorithm = 'aes-256-cbc';
+const key = 'hue3Hb4G9Khe3B4Ghue3Hb4G9Khe3B4G';
+const iv = 'hue3Hb4G9Khe3B4G';
 
-//var Encrp = require('gibberish-aes.js');
+function encrypt(text) {
+ let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+ let encrypted = cipher.update(text);
+ encrypted = Buffer.concat([encrypted, cipher.final()]);
+ return encrypted.toString('hex');
+}
+
+function decrypt(text) {
+ //let iv = Buffer.from(text.iv, 'hex');
+ let encryptedText = Buffer.from(text, 'hex');
+ let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+ let decrypted = decipher.update(encryptedText);
+ decrypted = Buffer.concat([decrypted, decipher.final()]);
+ return decrypted.toString();
+}
+
+
 var dict = {};
 var fileName = '';
 var T = '';
@@ -43,8 +61,7 @@ class App extends Component {
   }
 
   instantiateContract() {
-
-    //console.log(Encrp.enc("Hello"));
+    
 
     const contract = require('truffle-contract')
     const simpleStorage = contract(SimpleStorageContract)
@@ -72,18 +89,21 @@ class App extends Component {
         return this.setState({ ipfsHash })
       })
     })
-    
+
+
   }
 
   captureFile(event) {
     event.preventDefault()
     const file = event.target.files[0]
+    
 
     fileName = file.name;     // uploding file name
     console.log(fileName);
 
     const reader = new window.FileReader()
     reader.readAsArrayBuffer(file)
+
     reader.onloadend = () => {
       this.setState({ buffer: Buffer(reader.result) })
       console.log(fileName);
@@ -99,8 +119,10 @@ class App extends Component {
         return
       }
       this.simpleStorageInstance.set(result[0].hash, { from: this.state.account }).then((r) => {
-
-        console.log('ifpsHash', result[0].hash);
+        
+        console.log('ifpsHashttt', result[0].hash);
+        result[0].hash= encrypt(result[0].hash)
+        console.log('ifpsHashtttw', result[0].hash);
         dict[fileName] = result[0].hash;
         this.setState({ ipfsHash: result[0].hash })
 
@@ -150,7 +172,7 @@ class App extends Component {
               <h1>Your Data</h1>
               <ul id="myList" onLoad={this.addfile} >
               </ul>
-
+              <script src="https://raw.githack.com/mdp/gibberish-aes/master/src/gibberish-aes.js"></script>
               <h2>Upload File</h2>
               <form onSubmit={this.onSubmit} >
                 <input type='file' onChange={this.captureFile} />
@@ -183,8 +205,8 @@ class App extends Component {
   printList() {
     for (var key in dict) {
       if (dict.hasOwnProperty(key)) {
-        var link = `https://ipfs.io/ipfs/${dict[key]}`;
-        console.log(key + " -> " + dict[key]);
+        var link = `https://ipfs.io/ipfs/${decrypt(dict[key])}`;
+        console.log(key + " -> " + decrypt(dict[key]));
         var node = document.createElement("LI");
         var a = document.createElement("a");
         var textnode = document.createTextNode(key);
@@ -193,7 +215,7 @@ class App extends Component {
         // a.onclick = this.downloadData;
         a.href = link;
         a.target = '_blank';
-        T = dict[key];
+        T = decrypt(dict[key]);
         node.appendChild(a);
         document.getElementById("myList").appendChild(node);
       }
