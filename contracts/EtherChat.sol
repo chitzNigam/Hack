@@ -102,9 +102,5 @@ contract EtherChat {
 			return false;
 	}
 	
-
-	//TODO : check subscribe and publish
-	//TODO : End-to-End encryption
-	//TODO : IPFS
 	
 }
