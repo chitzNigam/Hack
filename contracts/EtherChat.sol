@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity >=0.4.21 <0.7.0;
 pragma experimental ABIEncoderV2;
 
 contract EtherChat {
@@ -18,8 +18,8 @@ contract EtherChat {
 	constructor () public {
 		usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b] = "01";
 		usernames[0xC134252dEdef77ea78A0CeD1d918c443e1C0739A] = "00";
-		subcriberList[usernames[0xC134252dEdef77ea78A0CeD1d918c443e1C0739A]].push("01");
-		Msg t = new Msg(usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b],1,"Hello");
+		subscriberList[usernames[0xC134252dEdef77ea78A0CeD1d918c443e1C0739A]].push("01");
+		Msg memory t = Msg(usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b],1,"Hello");
 		users[usernames[0xfCAE8fE9C7757014a5b028686250cD1C28c2269b]]["00"] = t;
 		s = msg.sender;
 
@@ -85,10 +85,10 @@ contract EtherChat {
 		}
 	}
 	
-	function _isPresentInList (string[] memory list, string memory s) private returns (bool) {
+	function _isPresentInList (string[] memory list, string memory _str) private returns (bool) {
 		uint i=0;
 		for(i=0; i<list.length; ++i){
-			if(_strcomp(s,list[i])){
+			if(_strcomp(_str,list[i])){
 				return true;
 			}
 		}
