@@ -7,16 +7,10 @@ import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 const crypto = require('crypto');
-const algorithm = 'aes-256-cbc';
 const key = 'hue3Hb4G9Khe3B4Ghue3Hb4G9Khe3B4G';
 const iv = 'hue3Hb4G9Khe3B4G';
+// const regx = require('filename-regex');
 
-function encrypt(text) {
- let cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
- let encrypted = cipher.update(text);
- encrypted = Buffer.concat([encrypted, cipher.final()]);
- return encrypted.toString('hex');
-}
 
 function decrypt(text) {
  //let iv = Buffer.from(text.iv, 'hex');
@@ -29,9 +23,6 @@ function decrypt(text) {
 
 
 var dict = {};
-var fileName = '';
-var T = '';
-
 class App extends Component {
 
   constructor(props) {
@@ -43,8 +34,7 @@ class App extends Component {
       buffer: null,
       account: null,
     }
-    this.captureFile = this.captureFile.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.uploadvid = this.uploadvid.bind(this);
   }
 
   componentWillMount() {
@@ -93,73 +83,6 @@ class App extends Component {
 
   }
 
-  captureFile(event) {
-    event.preventDefault()
-    const file = event.target.files[0]
-    
-
-    fileName = file.name;     // uploding file name
-    console.log(fileName);
-
-    const reader = new window.FileReader()
-    reader.readAsArrayBuffer(file)
-
-    reader.onloadend = () => {
-      this.setState({ buffer: Buffer(reader.result) })
-      console.log(fileName);
-      console.log(this.state.buffer)
-    }
-  }
-
-  onSubmit(event) {
-    event.preventDefault()
-    ipfs.files.add(this.state.buffer, (error, result) => {
-      if(error) {
-        console.error(error)
-        return
-      }
-      this.simpleStorageInstance.set(result[0].hash, { from: this.state.account }).then((r) => {
-        
-        console.log('ifpsHashttt', result[0].hash);
-        result[0].hash= encrypt(result[0].hash)
-        console.log('ifpsHashtttw', result[0].hash);
-        dict[fileName] = result[0].hash;
-        this.setState({ ipfsHash: result[0].hash })
-
-        for (var key in dict) {
-          if (dict.hasOwnProperty(key)) {
-            console.log(key + " -> " + dict[key]);
-          }
-        }
-
-        // adding json file==
-        var buf = Buffer.from(JSON.stringify(dict));
-        console.log('printing buffer');
-        console.log('buffer  ' , buf);
-
-        console.log('uploading file........');
-        ipfs.files.add(buf, (error, result) => {
-          if(error) {
-            console.error("error in uploading file...");
-            return
-          }
-          this.simpleStorageInstance.set(result[0].hash, { from: this.state.account }).then((r) => {
-
-            console.log('value of r');
-            console.log(r.toString());
-            console.log('ifpsHash', result[0].hash);
-            console.log('uploaded successfully........');
-            this.clearList();
-            this.printList();
-            return this.setState({ ipfsHash: result[0].hash })
-          })
-        })
-
-      })
-    })
-    
-  }
-
   render() {
     return (
       <div className="App">
@@ -169,15 +92,9 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <h1>Your Data</h1>
+              <h1>Upload this file on DNetTube</h1>
               <ul id="myList" onLoad={this.addfile} >
               </ul>
-              <script src="https://raw.githack.com/mdp/gibberish-aes/master/src/gibberish-aes.js"></script>
-              <h2>Upload File</h2>
-              <form onSubmit={this.onSubmit} >
-                <input type='file' onChange={this.captureFile} />
-                <input type='submit' />
-              </form>
             </div>
           </div>
         </main>
@@ -185,39 +102,32 @@ class App extends Component {
     );
   }
 
-
-  async downloadData(){
-    // const BufferList = require('bl/BufferList')
-    // const cid = T;
-
-    // for  (const file of ipfs.get(cid)) {
-    //   console.log(file.path)
-
-    //   const content = new BufferList()
-    //   for await (const chunk of file.content) {
-    //     content.append(chunk)
-    //   }
-
-    //   console.log(content.toString())
-    // }
+  uploadvid(event) {
+    event.preventDefault()
+    alert('video uploaded successfully')
+    var temp = event.target.title
+    console.log("Successful "+temp);
+    console.log('hash= '+decrypt(dict[temp]))
   }
 
+  
+
   printList() {
+    const videx = new RegExp("^.*\.(avi|AVI|wmv|WMV|flv|FLV|mpg|MPG|mp4|MP4)$")
     for (var key in dict) {
-      if (dict.hasOwnProperty(key)) {
-        var link = `https://ipfs.io/ipfs/${decrypt(dict[key])}`;
-        console.log(key + " -> " + decrypt(dict[key]));
-        var node = document.createElement("LI");
-        var a = document.createElement("a");
-        var textnode = document.createTextNode(key);
-        a.appendChild(textnode);
-        a.title = key;
-        // a.onclick = this.downloadData;
-        a.href = link;
-        a.target = '_blank';
-        T = decrypt(dict[key]);
-        node.appendChild(a);
-        document.getElementById("myList").appendChild(node);
+      if(videx.test(key)){
+        if (dict.hasOwnProperty(key)) {
+          console.log(key + " -> " + decrypt(dict[key]));
+          var node = document.createElement("LI");
+          var a = document.createElement("a");
+          var textnode = document.createTextNode(key);
+          a.appendChild(textnode);
+          a.title = key;
+          a.href = "#"
+          a.onclick = this.uploadvid;
+          node.appendChild(a);
+          document.getElementById("myList").appendChild(node);
+        }
       }
     }
   }
