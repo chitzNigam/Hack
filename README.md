@@ -1,7 +1,7 @@
 # Hack36
 # Team: Oo_Bhai
 
-Project Objective: Develop a Distributed Ecosystem of services which surrounds the Storage system, with the data for each of these services being implemented on the Blockchain Infrastructure. 
+Project Objective: Develop a Distributed Ecosystem of services which surrounds the Storage and Data Sharing system, with the data for each of these services being implemented on the Blockchain Infrastructure. 
 
 The scope of this project aims to ensure the following:
             *Immutable Data – Prevents Volatility of value.
@@ -9,10 +9,11 @@ The scope of this project aims to ensure the following:
             *Security from Cyberattacks.
             *E2EE
             *Provision of Decentralized Information with Individual participation from all users.
+            *Prevent any misuse of User's data by any corporation or Hackers
             
 Key Points:
 
-            *Usage of Smart Contracts between entities which acts as a public ledger but provide anonymity to the individuals associated with the contract.
+            *Usage of Smart Contracts between entities which acts as a public ledger but provide anonymity to the individuals associated                with the contract.
 
             *Usage of Ethereum which decrease the probability of 51% attack significantly.
 
