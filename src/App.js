@@ -12,6 +12,7 @@ const iv = 'hue3Hb4G9Khe3B4G';
 // const regx = require('filename-regex');
 
 
+
 function decrypt(text) {
  //let iv = Buffer.from(text.iv, 'hex');
  let encryptedText = Buffer.from(text, 'hex');
@@ -34,7 +35,7 @@ class App extends Component {
       buffer: null,
       account: null,
     }
-    //this.uploadvid = this.uploadvid.bind(this);
+    this.uploadvid = this.uploadvid.bind(this);
   }
 
   componentWillMount() {
@@ -73,8 +74,7 @@ class App extends Component {
           var buf = r[0]['content'];
           console.log(buf);
           dict = JSON.parse(buf.toString());
-          // this.printList();
-          this.init();
+          this.printList();
 
         } );
         return this.setState({ ipfsHash })
@@ -93,13 +93,9 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <div id="init">
               <h1>Upload this file on DNetTube</h1>
-              </div>
-              <div id="init2">
-                <ul id="myList" >
-                </ul>
-              </div>
+              <ul id="myList" onLoad={this.addfile} >
+              </ul>
             </div>
           </div>
         </main>
@@ -108,7 +104,6 @@ class App extends Component {
   }
 
   uploadvid(event) {
-    console.log("aesfrdthyu");
     event.preventDefault()
     alert('video uploaded successfully')
     var temp = event.target.title
@@ -116,38 +111,7 @@ class App extends Component {
     console.log('hash= '+decrypt(dict[temp]))
   }
 
-  submitvid(){
-    while(document.getElementById("init").childElementCount > 0){
-      var list = document.getElementById("init");
-      list.removeChild(list.childNodes[0]);
-    }
-    // this.clearList();
-    // this.printList()
-    const videx = new RegExp("^.*\.(avi|AVI|wmv|WMV|flv|FLV|mpg|MPG|mp4|MP4)$")
-    for (var key in dict) {
-      if(videx.test(key)){
-        if (dict.hasOwnProperty(key)) {
-          console.log(key + " -> " + decrypt(dict[key]));
-          var node = document.createElement("LI");
-          var a = document.createElement("a");
-          var textnode = document.createTextNode(key);
-          a.appendChild(textnode);
-          a.title = key;
-          a.href = "#"
-          a.onclick = (event) => {
-            console.log("aesfrdthyu");
-            event.preventDefault()
-            alert('video uploaded successfully')
-            var temp = event.target.title
-            console.log("Successful "+temp);
-            console.log('hash= '+decrypt(dict[temp]))
-          };
-          node.appendChild(a);
-          document.getElementById("myList").appendChild(node);
-        }
-      }
-    }
-  }
+  
 
   printList() {
     const videx = new RegExp("^.*\.(avi|AVI|wmv|WMV|flv|FLV|mpg|MPG|mp4|MP4)$")
@@ -174,14 +138,6 @@ class App extends Component {
       var list = document.getElementById("myList");
       list.removeChild(list.childNodes[0]);
     }
-  }
-
-  init(){
-    var btn = document.createElement("BUTTON");
-    btn.onclick = this.submitvid;
-    var textnode = document.createTextNode("Upload the video from DNetDrive");
-    btn.appendChild(textnode);
-    document.getElementById("init").appendChild(btn);
   }
 
 }
